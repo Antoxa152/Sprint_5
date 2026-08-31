@@ -14,7 +14,7 @@ def generate_name():
         return random_user_name
 
 def generate_email():
-        length = 3
+        length = 9
         characters = string.digits
         random_user_email = ''.join(random.choice(characters) for _ in range(length)) + '@ya.ru'
         return random_user_email

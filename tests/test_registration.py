@@ -5,12 +5,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from data_randomizer import generate_name, generate_email, generate_password, generate_incorrect_password
 from locators import Locators
 from conftest import driver
+from config import BASE_URL
 
-
-
-# Позитивная проверка регистрации
 def test_registration_positive(driver):
-    driver.get("https://stellarburgers.education-services.ru/")
+    driver.get(BASE_URL)
 
     user_name = generate_name()
     user_email = generate_email()
@@ -31,9 +29,8 @@ def test_registration_positive(driver):
     assert driver.find_element(*Locators.register_link).is_displayed()
 
 
-# Регистрация с невалидным паролем
 def test_registration_incorrect_password_message(driver):
-    driver.get("https://stellarburgers.education-services.ru/")
+    driver.get(BASE_URL)
 
     user_name = generate_name()
     user_email = generate_email()
