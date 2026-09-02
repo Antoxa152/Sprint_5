@@ -1,41 +1,45 @@
 import pytest
-from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from locators import Locators
-from conftest import driver
+from config import BASE_URL
+from data import TEST_EMAIL, TEST_PASSWORD
 
 
-# Переход по клику на «Конструктор»
-def test_navigate_to_constructor_to_personal_account_via_constructor_button(driver):
-    driver.get("https://stellarburgers.education-services.ru/")
+class TestNavigationFromProfile:
+    """Тесты для проверки навигации из личного кабинета обратно в конструктор."""
 
-    email = 'antoxa2709@yandex.ru'
-    password = 'qwerty123'
+    @staticmethod
+    def _login_and_go_to_profile(driver, email, password):
+        """Вспомогательный метод: вход в систему и переход в личный кабинет (без ожиданий)."""
+        driver.get(BASE_URL)
+        driver.find_element(*Locators.login_button_main_page).click()
+        driver.find_element(*Locators.email_field).send_keys(email)
+        driver.find_element(*Locators.password_field).send_keys(password)
+        driver.find_element(*Locators.login_button).click()
 
-    driver.find_element(*Locators.login_button_main_page).click()
-    driver.find_element(*Locators.email_field).send_keys(email)
-    driver.find_element(*Locators.password_field).send_keys(password)
-    driver.find_element(*Locators.login_button).click()
-    driver.find_element(*Locators.personal_account_button).click()
-    WebDriverWait(driver, 6).until(EC.visibility_of_element_located(Locators.profile))
-    driver.find_element(*Locators.constructor_button_in_header).click()
-    WebDriverWait(driver, 6).until(EC.visibility_of_element_located(Locators.make_an_order_button))
-    assert driver.find_element(*Locators.make_an_order_button).is_displayed()
+        driver.find_element(*Locators.personal_account_button).click()
+        # Ожидание убрано: его место — в ассерте в тесте или отдельном _assert_* методе
 
-# Переход по клику на логотип Stellar Burgers
-def test_navigate_to_constructor_to_personal_account_via_constructor_logo(driver):
-    driver.get("https://stellarburgers.education-services.ru/")
+    @staticmethod
+    def _assert_element_visible(driver, locator, timeout=8):
+        """Проверить, что элемент виден: ожидание инкапсулировано в ассерте."""
+        wait = WebDriverWait(driver, timeout)
+        assert wait.until(EC.visibility_of_element_located(locator))
 
-    email = 'antoxa2709@yandex.ru'
-    password = 'qwerty123'
+    def test_navigate_via_constructor_button(self, driver):
+        """Переход в конструктор по кнопке «Конструктор» в шапке."""
+        self._login_and_go_to_profile(driver, TEST_EMAIL, TEST_PASSWORD)
+        self._assert_element_visible(driver, Locators.profile)
 
-    driver.find_element(*Locators.login_button_main_page).click()
-    driver.find_element(*Locators.email_field).send_keys(email)
-    driver.find_element(*Locators.password_field).send_keys(password)
-    driver.find_element(*Locators.login_button).click()
-    driver.find_element(*Locators.personal_account_button).click()
-    WebDriverWait(driver, 6).until(EC.visibility_of_element_located(Locators.profile))
-    driver.find_element(*Locators.logo).click()
-    WebDriverWait(driver, 6).until(EC.visibility_of_element_located(Locators.make_an_order_button))
-    assert driver.find_element(*Locators.make_an_order_button).is_displayed()
+        driver.find_element(*Locators.constructor_button_in_header).click()
+        self._assert_element_visible(driver, Locators.make_an_order_button)
+
+    def test_navigate_via_logo(self, driver):
+        """Переход в конструктор по клику на логотип Stellar Burgers."""
+        self._login_and_go_to_profile(driver, TEST_EMAIL, TEST_PASSWORD)
+        self._assert_element_visible(driver, Locators.profile)
+
+        driver.find_element(*Locators.logo).click()
+        self._assert_element_visible(driver, Locators.make_an_order_button)
+        
