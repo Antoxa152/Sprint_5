@@ -1,5 +1,8 @@
 import pytest
 from pages.profile_page import ProfilePage
+from locators import Locators
+from config import BASE_URL
+from data import TEST_EMAIL, TEST_PASSWORD
 
 class TestNavigationFromProfile:
     

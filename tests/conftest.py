@@ -10,7 +10,7 @@ if project_root not in sys.path:
 import pytest
 from selenium import webdriver
 from pages.login_page import LoginPage
-from pages.profile_page import ProfilePage  # <-- вот этого импорта не хватало!
+from pages.profile_page import ProfilePage
 from config import BASE_URL
 from data import TEST_EMAIL, TEST_PASSWORD
 
@@ -21,15 +21,24 @@ def driver():
     driver.quit()
 
 @pytest.fixture
-def driver_with_auth(driver):
+def login_page(driver):
     page = LoginPage(driver)
     page.open(BASE_URL)
-    page.click_main_login_button()
-    page.perform_login(TEST_EMAIL, TEST_PASSWORD)
-    page.assert_logged_in()
-    return driver
+    return page
+
+@pytest.fixture
+def driver_with_auth(login_page):
+    login_page.click_main_login_button()
+    login_page.perform_login(TEST_EMAIL, TEST_PASSWORD)
+    return login_page.driver
 
 @pytest.fixture
 def profile_page(driver_with_auth):
     return ProfilePage(driver_with_auth)
 
+@pytest.fixture
+def register_page(driver):
+    from pages.register_page import RegisterPage
+    page = RegisterPage(driver)
+    page.open_registration_form() 
+    return page

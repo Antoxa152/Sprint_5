@@ -6,12 +6,6 @@ from data import TEST_EMAIL, TEST_PASSWORD
 class TestLogin:
     """Тесты для проверки разных сценариев входа в систему."""
 
-    @pytest.fixture
-    def login_page(self, driver):
-        page = LoginPage(driver)
-        page.open(BASE_URL)
-        return page
-
     def test_login_via_button_on_main_page(self, login_page):
         """Вход по кнопке «Войти в аккаунт» на главной странице."""
         login_page.click_main_login_button()
